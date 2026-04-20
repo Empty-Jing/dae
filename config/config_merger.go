@@ -24,13 +24,15 @@ var (
 type Merger struct {
 	entry             string
 	entryDir          string
+	configKey         string
 	entryToSectionMap map[string]map[string][]*config_parser.Item
 }
 
-func NewMerger(entry string) *Merger {
+func NewMerger(entry string, configKey string) *Merger {
 	return &Merger{
 		entry:             entry,
 		entryDir:          filepath.Dir(entry),
+		configKey:         configKey,
 		entryToSectionMap: map[string]map[string][]*config_parser.Item{},
 	}
 }
@@ -79,6 +81,10 @@ func (m *Merger) readEntry(entry string) (err error) {
 	}
 	// Read and parse.
 	b, err := io.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	b, err = decryptConfigBytesIfNeeded(entry, b, m.configKey)
 	if err != nil {
 		return err
 	}
