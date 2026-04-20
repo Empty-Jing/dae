@@ -58,6 +58,7 @@ var (
 
 func init() {
 	runCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file of dae.(required)")
+	runCmd.PersistentFlags().StringVar(&configKey, "config-key", "", "Passphrase source for encrypted config (e.g. file:/path/to/key). If not set, config is read as plaintext.")
 	runCmd.PersistentFlags().StringVar(&logFile, "logfile", "", "Log file to write. Empty means writing to stdout and stderr.")
 	runCmd.PersistentFlags().IntVar(&logFileMaxSize, "logfile-maxsize", 30, "Unit: MB. The maximum size in megabytes of the log file before it gets rotated.")
 	runCmd.PersistentFlags().IntVar(&logFileMaxBackups, "logfile-maxbackups", 3, "The maximum number of old log files to retain.")
@@ -71,6 +72,7 @@ func init() {
 
 var (
 	cfgFile           string
+	configKey         string
 	logFile           string
 	logFileMaxSize    int
 	logFileMaxBackups int
@@ -94,7 +96,7 @@ var (
 			}
 
 			// Read config from --config cfgFile.
-			conf, includes, err := readConfig(cfgFile)
+			conf, includes, err := readConfig(cfgFile, configKey)
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
 					"err": err,
@@ -233,7 +235,7 @@ loop:
 				newConf.Global.LogLevel = "warning"
 			} else {
 				var includes []string
-				newConf, includes, err = readConfig(cfgFile)
+				newConf, includes, err = readConfig(cfgFile, configKey)
 				if err != nil {
 					log.WithFields(logrus.Fields{
 						"err": err,
@@ -484,8 +486,8 @@ func preprocessWanInterfaceAuto(params *config.Config) error {
 	return nil
 }
 
-func readConfig(cfgFile string) (conf *config.Config, includes []string, err error) {
-	merger := config.NewMerger(cfgFile)
+func readConfig(cfgFile string, configKey string) (conf *config.Config, includes []string, err error) {
+	merger := config.NewMerger(cfgFile, configKey)
 	sections, includes, err := merger.Merge()
 	if err != nil {
 		return nil, nil, err

@@ -22,7 +22,7 @@ var (
 				os.Exit(1)
 			}
 			// Read config from --config cfgFile.
-			_, _, err := readConfig(cfgFile)
+			_, _, err := readConfig(cfgFile, configKey)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -35,4 +35,5 @@ func init() {
 	rootCmd.AddCommand(validateCmd)
 
 	validateCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file")
+	validateCmd.PersistentFlags().StringVar(&configKey, "config-key", "", "Passphrase source for encrypted config (e.g. file:/path/to/key). If not set, config is read as plaintext.")
 }

@@ -17,7 +17,7 @@ func TestMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	merger := NewMerger(abs)
+	merger := NewMerger(abs, "")
 	sections, _, err := merger.Merge()
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestMarshal(t *testing.T) {
 	if err = os.WriteFile("/tmp/test.dae", b, 0640); err != nil {
 		t.Fatal(err)
 	}
-	sections, _, err = NewMerger("/tmp/test.dae").Merge()
+	sections, _, err = NewMerger("/tmp/test.dae", "").Merge()
 	if err != nil {
 		t.Fatal(err)
 	}
